@@ -1,6 +1,6 @@
 # Build settings
 [build]
-  command = "cd client && npm install && npm run build && cd ../server && npm install"
+  command = "npm install && cd client && npm install && npm run build"
   publish = "client/dist"
   functions = "server/api"
 
