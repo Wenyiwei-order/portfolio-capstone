@@ -4,10 +4,10 @@
   publish = "client/dist"
   functions = "server/api"
 
-# Redirect all API requests to serverless function
+# Redirect API requests to Netlify Function
 [[redirects]]
   from = "/api/*"
-  to = "/api/index"
+  to = "/.netlify/functions/index"
   status = 200
 
 # SPA fallback for React Router

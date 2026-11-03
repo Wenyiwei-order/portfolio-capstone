@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const helmet = require('helmet');
 const cors = require('cors');
+const serverless = require('serverless-http');
 
 const app = express();
 
@@ -32,21 +33,27 @@ app.use((req, res) => {
   res.status(404).json({ success: false, message: 'Route not found' });
 });
 
-// Database connection cache for serverless
+// Database connection cache
 let isConnected = false;
 
 async function connectDB() {
   if (isConnected) return;
   await mongoose.connect(process.env.MONGODB_URI);
   isConnected = true;
+  console.log('MongoDB connected');
 }
 
-module.exports = async (req, res) => {
+module.exports.handler = async (event, context) => {
+  context.callbackWaitsForEmptyEventLoop = false;
   try {
     await connectDB();
-    return app(req, res);
+    const handler = serverless(app);
+    return await handler(event, context);
   } catch (error) {
     console.error('DB error:', error);
-    return res.status(500).json({ success: false, message: 'Database connection failed' });
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ success: false, message: 'Database connection failed' })
+    };
   }
 };
